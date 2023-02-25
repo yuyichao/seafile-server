@@ -273,7 +273,7 @@ get_python_executable() {
 }
 
 static void
-init_seafile_path ()
+init_seafile_path (char *central_config_dir)
 {
     GError *error = NULL;
     char *binary = g_file_read_link (PROC_SELF_PATH, &error);
@@ -285,10 +285,8 @@ init_seafile_path ()
 
     bin_dir = g_path_get_dirname (binary);
 
-    tmp = g_path_get_dirname (bin_dir);
-    installpath = g_path_get_dirname (tmp);
-
-    topdir = g_path_get_dirname (installpath);
+    topdir = g_path_get_dirname (central_config_dir);
+    installpath = g_build_filename (topdir, "seafile-server", NULL);
 
     g_free (binary);
     g_free (tmp);
@@ -552,7 +550,7 @@ seaf_controller_init (SeafileController *ctl,
                       char *seafile_dir,
                       char *logdir)
 {
-    init_seafile_path ();
+    init_seafile_path (central_config_dir);
     if (!g_file_test (config_dir, G_FILE_TEST_IS_DIR)) {
         seaf_warning ("invalid config_dir: %s\n", config_dir);
         return -1;
